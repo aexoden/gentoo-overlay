@@ -1,0 +1,42 @@
+From addbad73866c65aaaab2d98f3800679aaa33ff17 Mon Sep 17 00:00:00 2001
+From: Gabor Karsay <gabor.karsay@gmx.at>
+Date: Sat, 25 Nov 2017 10:23:59 +0100
+Subject: [PATCH] [window] guard inclusion of GDK backends
+
+Fixes compilation on hurd-i386 and kfreebsd-*
+---
+ src/pt-preferences.c | 4 ++++
+ src/pt-window.c      | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/src/pt-preferences.c b/src/pt-preferences.c
+index 9c04966..2ea4232 100644
+--- a/src/pt-preferences.c
++++ b/src/pt-preferences.c
+@@ -18,8 +18,12 @@
+ #include "config.h"
+ #include <gtk/gtk.h>
+ #include <glib/gi18n.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
++#ifdef GDK_WINDOWING_WAYLAND
+ #include <gdk/gdkwayland.h>
++#endif
+ #include "pt-preferences.h"
+ 
+ 
+diff --git a/src/pt-window.c b/src/pt-window.c
+index 9948489..ff128e8 100644
+--- a/src/pt-window.c
++++ b/src/pt-window.c
+@@ -18,7 +18,9 @@
+ #include "config.h"
+ #include <gtk/gtk.h>
+ #include <glib/gi18n.h>
++#ifdef GDK_WINDOWING_X11
+ #include <gdk/gdkx.h>
++#endif
+ #include <libparlatype/src/pt-player.h>
+ #include <libparlatype/src/pt-progress-dialog.h>
+ #include <libparlatype/src/pt-waveviewer.h>
