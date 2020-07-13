@@ -1,0 +1,11 @@
+diff -urNp lyx-2.3.4.2-orig/src/insets/ExternalTemplate.cpp lyx-2.3.4.2-dwok/src/insets/ExternalTemplate.cpp
+--- lyx-2.3.4.2-orig/src/insets/ExternalTemplate.cpp	2020-05-13 20:35:18.478772790 +0200
++++ lyx-2.3.4.2-dwok/src/insets/ExternalTemplate.cpp	2020-05-13 20:35:55.100049358 +0200
+@@ -22,6 +22,7 @@
+ #include "support/PathChanger.h"
+ #include "support/Translator.h"
+ 
++#include <algorithm>
+ #include <ostream>
+ 
+ using namespace std;
