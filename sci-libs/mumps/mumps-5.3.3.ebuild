@@ -10,12 +10,14 @@ MYP=MUMPS_${PV}
 DESCRIPTION="MUltifrontal Massively Parallel sparse direct matrix Solver"
 HOMEPAGE="http://mumps.enseeiht.fr/"
 SRC_URI="http://mumps.enseeiht.fr/${MYP}.tar.gz"
+S="${WORKDIR}/${MYP}"
 
 LICENSE="public-domain"
 SLOT="0"
 KEYWORDS="~amd64 ~x86 ~amd64-linux ~x86-linux"
 IUSE="doc examples metis mpi +scotch static-libs"
 
+BDEPEND="virtual/pkgconfig"
 RDEPEND="
 	virtual/blas
 	metis? (
@@ -26,13 +28,10 @@ RDEPEND="
 	scotch? ( >=sci-libs/scotch-6.0.1:=[mpi=] )
 "
 DEPEND="${RDEPEND}"
-BDEPEND="virtual/pkgconfig"
-
-S="${WORKDIR}/${MYP}"
 
 get_version_component_count() {
 	local cnt=( $(ver_rs 1- ' ') )
-	echo ${#cnt[@]}
+	echo ${#cnt[@]} || die
 }
 
 static_to_shared() {
@@ -64,17 +63,17 @@ static_to_shared() {
 
 src_prepare() {
 	append-fflags -fallow-argument-mismatch
-	sed -e "s:^\(CC\s*=\).*:\1$(tc-getCC):" \
-		-e "s:^\(FC\s*=\).*:\1$(tc-getFC):" \
-		-e "s:^\(FL\s*=\).*:\1$(tc-getFC):" \
-		-e "s:^\(AR\s*=\).*:\1$(tc-getAR) cr :" \
-		-e "s:^\(RANLIB\s*=\).*:\1$(tc-getRANLIB):" \
-		-e "s:^\(LIBBLAS\s*=\).*:\1$($(tc-getPKG_CONFIG) --libs blas):" \
-		-e "s:^\(INCPAR\s*=\).*:\1:" \
-		-e 's:^\(LIBPAR\s*=\).*:\1$(SCALAP):' \
-		-e "s:^\(OPTF\s*=\).*:\1${FFLAGS} -DALLOW_NON_INIT \$(PIC):" \
-		-e "s:^\(OPTC\s*=\).*:\1${CFLAGS} \$(PIC):" \
-		-e "s:^\(OPTL\s*=\).*:\1${LDFLAGS}:" \
+	sed -e "s;^\(CC\s*=\).*;\1$(tc-getCC);" \
+		-e "s;^\(FC\s*=\).*;\1$(tc-getFC);" \
+		-e "s;^\(FL\s*=\).*;\1$(tc-getFC);" \
+		-e "s;^\(AR\s*=\).*;\1$(tc-getAR) cr ;" \
+		-e "s;^\(RANLIB\s*=\).*;\1$(tc-getRANLIB);" \
+		-e "s;^\(LIBBLAS\s*=\).*;\1$($(tc-getPKG_CONFIG) --libs blas);" \
+		-e "s;^\(INCPAR\s*=\).*;\1;" \
+		-e 's;^\(LIBPAR\s*=\).*;\1$(SCALAP);' \
+		-e "s;^\(OPTF\s*=\).*;\1${FFLAGS} -DALLOW_NON_INIT \$(PIC);" \
+		-e "s;^\(OPTC\s*=\).*;\1${CFLAGS} \$(PIC);" \
+		-e "s;^\(OPTL\s*=\).*;\1${LDFLAGS};" \
 		Make.inc/Makefile.inc.generic > Makefile.inc || die
 	# fixed a missing copy of libseq to libdir
 
@@ -86,53 +85,53 @@ src_configure() {
 	local ord="-Dpord"
 	if use metis && use mpi; then
 		sed -i \
-			-e "s:#\s*\(LMETIS\s*=\).*:\1$($(tc-getPKG_CONFIG) --libs parmetis):" \
-			-e "s:#\s*\(IMETIS\s*=\).*:\1$($(tc-getPKG_CONFIG) --cflags parmetis):" \
+			-e "s;#\s*\(LMETIS\s*=\).*;\1$($(tc-getPKG_CONFIG) --libs parmetis);" \
+			-e "s;#\s*\(IMETIS\s*=\).*;\1$($(tc-getPKG_CONFIG) --cflags parmetis);" \
 			Makefile.inc || die
 		LIBADD="${LIBADD} $($(tc-getPKG_CONFIG) --libs parmetis)"
 		ord="${ord} -Dparmetis"
 	elif use metis; then
 		sed -i \
-			-e "s:#\s*\(LMETIS\s*=\).*:\1$($(tc-getPKG_CONFIG) --libs metis):" \
-			-e "s:#\s*\(IMETIS\s*=\).*:\1$($(tc-getPKG_CONFIG) --cflags metis):" \
+			-e "s;#\s*\(LMETIS\s*=\).*;\1$($(tc-getPKG_CONFIG) --libs metis);" \
+			-e "s;#\s*\(IMETIS\s*=\).*;\1$($(tc-getPKG_CONFIG) --cflags metis);" \
 			Makefile.inc || die
 		LIBADD="${LIBADD} $($(tc-getPKG_CONFIG) --libs metis)"
 		ord="${ord} -Dmetis"
 	fi
 	if use scotch && use mpi; then
 		sed -i \
-			-e "s:#\s*\(LSCOTCH\s*=\).*:\1-lptesmumps -lptscotch -lptscotcherr:" \
-			-e "s:#\s*\(ISCOTCH\s*=\).*:\1-I${ESYSROOT}/usr/include/scotch:" \
+			-e "s;#\s*\(LSCOTCH\s*=\).*;\1-lptesmumps -lptscotch -lptscotcherr;" \
+			-e "s;#\s*\(ISCOTCH\s*=\).*;\1-I${ESYSROOT}/usr/include/scotch;" \
 			Makefile.inc || die
 		LIBADD="${LIBADD} -lptesmumps -lptscotch -lptscotcherr"
 		ord="${ord} -Dptscotch"
 	elif use scotch; then
 		sed -i \
-			-e "s:#\s*\(LSCOTCH\s*=\).*:\1-lesmumps -lscotch -lscotcherr:" \
-			-e "s:#\s*\(ISCOTCH\s*=\).*:\1-I${ESYSROOT}/usr/include/scotch:" \
+			-e "s;#\s*\(LSCOTCH\s*=\).*;\1-lesmumps -lscotch -lscotcherr;" \
+			-e "s;#\s*\(ISCOTCH\s*=\).*;\1-I${ESYSROOT}/usr/include/scotch;" \
 			Makefile.inc || die
 		LIBADD="${LIBADD} -lesmumps -lscotch -lscotcherr"
 		ord="${ord} -Dscotch"
 	fi
 	if use mpi; then
 		sed -i \
-			-e "s:^\(CC\s*=\).*:\1mpicc:" \
-			-e "s:^\(FC\s*=\).*:\1mpif90:" \
-			-e "s:^\(FL\s*=\).*:\1mpif90:" \
-			-e "s:^\(SCALAP\s*=\).*:\1$($(tc-getPKG_CONFIG) --libs scalapack):" \
+			-e "s;^\(CC\s*=\).*;\1mpicc;" \
+			-e "s;^\(FC\s*=\).*;\1mpif90;" \
+			-e "s;^\(FL\s*=\).*;\1mpif90;" \
+			-e "s;^\(SCALAP\s*=\).*;\1$($(tc-getPKG_CONFIG) --libs scalapack);" \
 			Makefile.inc || die
 		export LINK=mpif90
 		LIBADD="${LIBADD} $($(tc-getPKG_CONFIG) --libs scalapack)"
 	else
 		sed -i \
-			-e 's:-Llibseq:-L$(topdir)/libseq:' \
-			-e 's:PAR):SEQ):g' \
-			-e "s:^\(SCALAP\s*=\).*:\1:" \
-			-e 's:^LIBSEQNEEDED =:LIBSEQNEEDED = libseqneeded:g' \
+			-e 's;-Llibseq;-L$(topdir)/libseq;' \
+			-e 's;PAR);SEQ);g' \
+			-e "s;^\(SCALAP\s*=\).*;\1;" \
+			-e 's;^LIBSEQNEEDED =;LIBSEQNEEDED = libseqneeded;g' \
 			Makefile.inc || die
 		export LINK="$(tc-getFC)"
 	fi
-	sed -i -e "s:^\s*\(ORDERINGSF\s*=\).*:\1 ${ord}:" Makefile.inc || die
+	sed -i -e "s;^\s*\(ORDERINGSF\s*=\).*;\1 ${ord};" Makefile.inc || die
 }
 
 src_compile() {
