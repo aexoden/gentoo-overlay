@@ -9,7 +9,7 @@ EAPI=7
 inherit kernel-build
 
 MY_P=linux-${PV%.*}
-GENPATCHES_P=genpatches-${PV%.*}-$(( ${PV##*.} + 3 ))
+GENPATCHES_P=genpatches-${PV%.*}-$(( ${PV##*.} + 1 ))
 XANMOD_VERSION="1"
 
 DESCRIPTION="Full XanMod sources with cacule option and including Gentoo patches"
@@ -17,8 +17,8 @@ HOMEPAGE="https://www.xanmod.org/"
 SRC_URI+=" https://cdn.kernel.org/pub/linux/kernel/v$(ver_cut 1).x/${MY_P}.tar.xz
 	https://dev.gentoo.org/~alicef/dist/genpatches/${GENPATCHES_P}.base.tar.xz
 	https://dev.gentoo.org/~alicef/dist/genpatches/${GENPATCHES_P}.extras.tar.xz
-	https://github.com/xanmod/linux/releases/download/${PV}-xanmod${XANMOD_VERSION}/patch-${PV}-xanmod${XANMOD_VERSION}.xz
-	https://raw.githubusercontent.com/xanmod/linux/${PV}-xanmod${XANMOD_VERSION}/.config -> kernel.config"
+	https://github.com/xanmod/linux/releases/download/${PV}-xanmod${XANMOD_VERSION}-cacule/patch-${PV}-xanmod${XANMOD_VERSION}-cacule.xz
+	https://raw.githubusercontent.com/xanmod/linux/${PV}-xanmod${XANMOD_VERSION}-cacule/.config -> kernel.config"
 S=${WORKDIR}/${MY_P}
 
 LICENSE="GPL-2"
@@ -34,9 +34,12 @@ PDEPEND="
 	>=virtual/dist-kernel-${PV}"
 
 src_prepare() {
+	rm "${WORKDIR}"/100*.patch
+
 	local PATCHES=(
 		# meh, genpatches have no directory
 		"${WORKDIR}"/*.patch
+		"${WORKDIR}"/patch-${PV}-xanmod${XANMOD_VERSION}-cacule
 	)
 	default
 
