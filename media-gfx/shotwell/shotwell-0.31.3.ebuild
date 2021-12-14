@@ -1,7 +1,7 @@
-# Copyright 1999-2019 Gentoo Authors
+# Copyright 1999-2020 Gentoo Authors
 # Distributed under the terms of the GNU General Public License v2
 
-EAPI=6
+EAPI=7
 VALA_MIN_API_VERSION="0.40"
 
 inherit gnome.org gnome2-utils meson vala xdg
@@ -11,18 +11,19 @@ HOMEPAGE="https://wiki.gnome.org/Apps/Shotwell"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~ia64 ~ppc ~ppc64 ~sparc x86"
+KEYWORDS="~amd64 ~arm ~arm64 ~ppc64 ~sparc ~x86"
 IUSE="opencv udev"
 
 DEPEND="
 	>=x11-libs/gtk+-3.22.0:3
 	>=dev-libs/glib-2.40.0:2
 	>=dev-libs/libgee-0.8.5:0.8
-	>=net-libs/webkit-gtk-2.4:4
+	>=net-libs/webkit-gtk-2.26:4
 	>=dev-libs/json-glib-0.7.6
 	>=dev-libs/libxml2-2.6.32:2
 	x11-libs/gdk-pixbuf:2
 	>=dev-db/sqlite-3.5.9:3
+	>=media-libs/libchamplain-0.12[vala]
 	media-libs/gstreamer:1.0
 	media-libs/gst-plugins-base:1.0
 	>=media-libs/libgphoto2-2.5:=
@@ -50,27 +51,23 @@ BDEPEND="
 	app-crypt/gcr[vala]
 "
 
-PATCHES=(
-	"${FILESDIR}/shotwell-opencv4.patch"
-)
-
 src_prepare() {
-	sed -i -e"s/'opencv',/'opencv4',/" subprojects/shotwell-facedetect/meson.build
 	xdg_src_prepare
 	vala_src_prepare
 }
 
 src_configure() {
 	local emesonargs=(
-		-Dunity-support=false
+		-Dunity_support=false
 		# -Dpublishers # In 0.30.2 all get compiled in anyways, even if restricted list, affects only runtime support
-		-Dextra-plugins=true
+		-Dextra_plugins=true
 		#trace
 		#measure
-		-Ddupe-detection=true
+		-Ddupe_detection=true
 		$(meson_use udev)
-		-Dinstall-apport-hook=false
-		$(meson_use opencv face-detection)
+		-Dinstall_apport_hook=false
+		$(meson_use opencv face_detection)
+		-Dfatal_warnings=false
 	)
 	meson_src_configure
 }
