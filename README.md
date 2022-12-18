@@ -1,5 +1,8 @@
 # Aexoden's Gentoo Overlay
 
+NOTE: As of 2022-12-17, I am not using Gentoo on any of my machines, so it is
+unlikely this will see any updates until if and when I do return to Gentoo.
+
 Welcome to my Gentoo overlay. The primary purpose of this overlay is to provide
 fixed version of packages that currently do not build on Gentoo. (This is
 surprisingly common, and the problems will often languish unfixed for months,
