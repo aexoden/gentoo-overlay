@@ -1,0 +1,19 @@
+Source/Upstream: Reported, https://github.com/eoyilmaz/displaycal-py3/issues/264
+Reason: dist/net.displaycal.DisplayCAL.appdata.xml missing from tarball
+
+diff -Naur DisplayCAL-3.9.11/DisplayCAL/setup.py DisplayCAL-3.9.11.new/DisplayCAL/setup.py
+--- DisplayCAL-3.9.11/DisplayCAL/setup.py	2023-01-09 18:27:05.000000000 +0100
++++ DisplayCAL-3.9.11.new/DisplayCAL/setup.py	2023-06-28 16:28:13.690543661 +0200
+@@ -694,12 +694,6 @@
+             # Linux
+             data_files.append(
+                 (
+-                    os.path.join(os.path.dirname(data), "metainfo"),
+-                    [os.path.join(pydir, "..", "dist", appstream_id + ".appdata.xml")],
+-                )
+-            )
+-            data_files.append(
+-                (
+                     os.path.join(os.path.dirname(data), "applications"),
+                     [os.path.join(pydir, "..", "misc", f"{name.lower()}.desktop")]
+                     + safe_glob(
