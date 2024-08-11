@@ -13,7 +13,7 @@ S="${WORKDIR}/${MY_P}"
 
 LICENSE="ZLIB"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~loong ~mips ~ppc ~ppc64 ~riscv ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~riscv ~sparc"
 
 IUSE="alsa aqua cpu_flags_ppc_altivec cpu_flags_x86_3dnow cpu_flags_x86_mmx cpu_flags_x86_sse cpu_flags_x86_sse2 cpu_flags_x86_sse3 custom-cflags dbus doc fcitx gles1 gles2 +haptic ibus jack +joystick kms libsamplerate nas opengl oss pipewire pulseaudio sndio +sound static-libs test +threads udev +video vulkan wayland X xscreensaver"
 RESTRICT="!test? ( test )"
@@ -60,7 +60,8 @@ COMMON_DEPEND="
 	udev? ( >=virtual/libudev-208:=[${MULTILIB_USEDEP}] )
 	wayland? (
 		>=dev-libs/wayland-1.20[${MULTILIB_USEDEP}]
-		>=media-libs/mesa-9.1.6[${MULTILIB_USEDEP},egl(+),gles2,wayland]
+		gui-libs/libdecor[${MULTILIB_USEDEP}]
+		>=media-libs/mesa-9.1.6[${MULTILIB_USEDEP},egl(+),gles2(+),wayland]
 		>=x11-libs/libxkbcommon-0.2.0[${MULTILIB_USEDEP}]
 	)
 	X? (
@@ -76,8 +77,8 @@ COMMON_DEPEND="
 RDEPEND="
 	${COMMON_DEPEND}
 	fcitx? ( app-i18n/fcitx:= )
-	gles1? ( media-libs/mesa[${MULTILIB_USEDEP},gles1] )
-	gles2? ( media-libs/mesa[${MULTILIB_USEDEP},gles2] )
+	gles1? ( media-libs/mesa[${MULTILIB_USEDEP},gles1(+)] )
+	gles2? ( media-libs/mesa[${MULTILIB_USEDEP},gles2(+)] )
 	vulkan? ( media-libs/vulkan-loader )
 "
 DEPEND="
@@ -160,6 +161,8 @@ src_configure() {
 		-DSDL_DUMMYAUDIO=$(usex sound)
 		-DSDL_WAYLAND=$(usex wayland)
 		-DSDL_WAYLAND_SHARED=OFF
+		-DSDL_WAYLAND_LIBDECOR=$(usex wayland)
+		-DSDL_WAYLAND_LIBDECOR_SHARED=OFF
 		-DSDL_RPI=OFF
 		-DSDL_X11=$(usex X)
 		-DSDL_X11_SHARED=OFF
